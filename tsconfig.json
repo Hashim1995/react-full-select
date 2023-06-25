@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "module": "es6",
-    "allowSyntheticDefaultImports": true,
-    "target": "es5",
+    "target": "es2016",
     "jsx": "react",
-    "skipLibCheck": true,
-    "lib": ["dom", "es2015"],
-    "moduleResolution": "node"
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declarationDir": "types",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true
   }
 }
