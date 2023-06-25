@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "es6",
+    "allowSyntheticDefaultImports": true,
+    "target": "es5",
+    "jsx": "react",
+    "skipLibCheck": true,
+    "lib": ["dom", "es2015"],
+    "moduleResolution": "node"
+  }
+}
