@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { X, ChevronDown, ChevronUp, ChevronRight } from "react-feather";
 import useOnClickOutside from "./useOutSideHook";
-import "./index.css";
+import "./FullSelect.css";
 
 interface Option {
   value: string;
