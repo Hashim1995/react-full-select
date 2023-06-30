@@ -7,7 +7,7 @@
 // } from "react";
 // import { X, ChevronDown, ChevronUp, ChevronRight } from "react-feather";
 // import useOnClickOutside from "./useOutSideHook";
-import "./FullSelect.css";
+import "./FullSelect.scss";
 
 // interface Option {
 //   value: string;
@@ -580,7 +580,11 @@ import "./FullSelect.css";
 import React from "react";
 
 const FullSelect = () => {
-  return <div className="test">FullSelect Hello World!</div>;
+  return (
+    <div className="test">
+      <h1>FullSelect Hello World!</h1>
+    </div>
+  );
 };
 
 export default FullSelect;

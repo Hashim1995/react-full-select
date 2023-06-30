@@ -26,6 +26,7 @@ export default [
       // 👇 new
       postcss({
         plugins: [],
+        extensions: [".css", ".scss"],
       }),
     ],
   },
