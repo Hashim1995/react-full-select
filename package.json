@@ -1,8 +1,9 @@
 {
   "name": "react-full-select",
-  "version": "1.0.82",
+  "version": "1.0.88",
   "description": "Tree React Select",
   "scripts": {
+    "dev": "react-scripts start",
     "rollup-build-lib": "rollup -c"
   },
   "author": "Hashim Hashimli",
