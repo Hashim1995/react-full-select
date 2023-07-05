@@ -1,48 +1,44 @@
 import React, { useRef, useState } from "react";
 import "./TreeSelect.scss";
 import useOnClickOutside from "./useOutSideHook";
-
-interface Option {
-  id: string;
-  label: string;
-  children?: Option[];
-}
+import { findById } from "./utils";
+import { IOption } from "./types";
 
 interface TreeSelectProps {
-  options: Option[];
+  options: IOption[];
   isMulti?: boolean;
-  defaultValue?: string | string[];
-  onChange?: (selectedValues: string | string[]) => void;
+  placeholder?: string;
+  defaultValue?: IOption | IOption[];
+  onChange?: (selectedValues: IOption) => void;
 }
 
 const TreeSelect: React.FC<TreeSelectProps> = ({
   options,
-  isMulti = false,
-  defaultValue = "",
+  placeholder = "search",
+  isMulti = true,
+  defaultValue,
   onChange = () => {},
 }) => {
   const [searchValue, setSearchValue] = useState("");
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const treeRef = useRef();
 
-  const [selectedValues, setSelectedValues] = useState<string[]>(
-    Array.isArray(defaultValue)
-      ? defaultValue
-      : defaultValue
-      ? [defaultValue]
-      : []
+  const [selectedValues, setSelectedValues] = useState<IOption[]>(
+    Array.isArray(defaultValue) ? defaultValue : [defaultValue]
   );
 
-  const handleOptionClick = (value: string) => {
+  const handleOptionClick = (option: IOption) => {
     let newSelectedValues;
     if (isMulti) {
-      if (selectedValues.includes(value)) {
-        newSelectedValues = selectedValues.filter((v) => v !== value);
+      if (findById(selectedValues, option?.value)) {
+        newSelectedValues = selectedValues.filter(
+          (v) => v?.value !== option?.value
+        );
       } else {
-        newSelectedValues = [...selectedValues, value];
+        newSelectedValues = [...selectedValues, option];
       }
     } else {
-      newSelectedValues = [value];
+      newSelectedValues = [option];
     }
     setSelectedValues(newSelectedValues);
     onChange(newSelectedValues);
@@ -52,12 +48,12 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
     setSearchValue(event.target.value);
   };
 
-  const renderOptions = (options: Option[]) => {
-    return options.map((option: Option) => (
-      <li key={option.id} className="tree-select__option">
+  const renderOptions = (options: IOption[]) => {
+    return options.map((option: IOption) => (
+      <li key={option.value} className="tree-select__option">
         <div
           className="tree-select__option-label"
-          onClick={() => handleOptionClick(option.id)}
+          onClick={() => handleOptionClick(option)}
         >
           {option.label}
         </div>
@@ -70,7 +66,7 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
     ));
   };
 
-  const filteredOptions = options.filter((option: Option) =>
+  const filteredOptions = options.filter((option: IOption) =>
     option.label.toLowerCase().includes(searchValue.toLowerCase())
   );
 
@@ -82,12 +78,12 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
     <div ref={treeRef} className="tree-select">
       <div className="tree-select__input">
         <div className="tree-select__selected-items">
-          {selectedValues.map((value) => (
-            <span key={value} className="tree-select__selected-item">
-              {options.find((option) => option.id === value)?.label}
+          {selectedValues.map((item) => (
+            <span key={item?.value} className="tree-select__selected-item">
+              {item?.label}
               <button
                 className="tree-select__remove-button"
-                onClick={() => handleOptionClick(value)}
+                onClick={() => handleOptionClick(item)}
               >
                 &#x2715;
               </button>
@@ -97,15 +93,15 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
         <input
           type="text"
           className="tree-select__search-input"
-          placeholder="Search..."
+          placeholder={placeholder}
           value={searchValue}
           onChange={handleSearchChange}
         />
         <span
           onClick={() => setShowOptions(!showOptions)}
-          className="tree-select__arrow"
+          className={`tree-select__arrow ${showOptions ? "up" : "down"}`}
         >
-          &#x25B6;
+          &uarr;
         </span>
       </div>
       {showOptions && (
