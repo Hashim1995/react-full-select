@@ -91,9 +91,13 @@
 
     &__option {
       cursor: pointer;
+      list-style: none;
 
       &-label {
         padding: 5px;
+      }
+      &-selected {
+        background-color: rgb(57, 57, 189);
       }
     }
 

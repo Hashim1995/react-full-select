@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import "./TreeSelect.scss";
 import useOnClickOutside from "./useOutSideHook";
 import { findById } from "./utils";
@@ -24,20 +24,25 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
   const treeRef = useRef();
 
   const [selectedValues, setSelectedValues] = useState<IOption | IOption[]>(
-    Array.isArray(defaultValue) ? defaultValue : [defaultValue] || null
+    isMulti ? [] : null
   );
+  const flattenSelectedValues = useMemo(() => {
+    return Array.isArray(selectedValues) && selectedValues.flat(Infinity);
+  }, [selectedValues]);
 
   const handleOptionClick = (option: IOption) => {
     let newSelectedValues: IOption | IOption[];
     if (isMulti) {
       if (Array.isArray(selectedValues)) {
-        if (findById(selectedValues, option?.value)) {
+        if (findById(flattenSelectedValues, option?.value)) {
           newSelectedValues = selectedValues?.filter(
             (v) => v?.value !== option?.value
           );
         } else {
           newSelectedValues = [...selectedValues, option];
         }
+      } else {
+        newSelectedValues = option;
       }
     } else {
       newSelectedValues = option;
@@ -52,9 +57,11 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
 
   const renderOptions = (options: IOption[]) => {
     return options.map((option: IOption) => (
-      <li key={option.value} className="tree-select__option">
+      <li key={option.value} className={`tree-select__option`}>
         <div
-          className="tree-select__option-label"
+          className={`tree-select__option-label ${checkIfOptionSelected(
+            option.value
+          )}`}
           onClick={() => handleOptionClick(option)}
         >
           {option.label}
@@ -77,8 +84,9 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
   });
 
   const handleSelectedItems = (par: IOption | IOption[]) => {
+    console.log("called");
     if (Array.isArray(par)) {
-      par?.map((item: IOption) => (
+      return par?.map((item: IOption) => (
         <span key={item?.value} className="tree-select__selected-item">
           {item?.label}
           <button
@@ -103,10 +111,19 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
       );
     }
   };
+  const checkIfOptionSelected = (id: string) => {
+    if (findById(flattenSelectedValues, id)) {
+      return "tree-select__option-selected";
+    }
+    return "";
+  };
 
   return (
     <div ref={treeRef} className="tree-select">
-      <div className="tree-select__input">
+      <div
+        onClick={() => setShowOptions(!showOptions)}
+        className="tree-select__input"
+      >
         <div className="tree-select__selected-items">
           {handleSelectedItems(selectedValues)}
         </div>
@@ -117,10 +134,7 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
           value={searchValue}
           onChange={handleSearchChange}
         />
-        <span
-          onClick={() => setShowOptions(!showOptions)}
-          className={`tree-select__arrow ${showOptions ? "up" : "down"}`}
-        >
+        <span className={`tree-select__arrow ${showOptions ? "up" : "down"}`}>
           &uarr;
         </span>
       </div>
