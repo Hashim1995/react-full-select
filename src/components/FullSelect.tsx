@@ -9,7 +9,7 @@ interface TreeSelectProps {
   isMulti?: boolean;
   placeholder?: string;
   defaultValue?: IOption | IOption[];
-  onChange?: (selectedValues: IOption) => void;
+  onChange?: (selectedValues: IOption | IOption[]) => void;
 }
 
 const TreeSelect: React.FC<TreeSelectProps> = ({
@@ -23,22 +23,24 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const treeRef = useRef();
 
-  const [selectedValues, setSelectedValues] = useState<IOption[]>(
-    Array.isArray(defaultValue) ? defaultValue : [defaultValue]
+  const [selectedValues, setSelectedValues] = useState<IOption | IOption[]>(
+    Array.isArray(defaultValue) ? defaultValue : [defaultValue] || null
   );
 
   const handleOptionClick = (option: IOption) => {
-    let newSelectedValues;
+    let newSelectedValues: IOption | IOption[];
     if (isMulti) {
-      if (findById(selectedValues, option?.value)) {
-        newSelectedValues = selectedValues.filter(
-          (v) => v?.value !== option?.value
-        );
-      } else {
-        newSelectedValues = [...selectedValues, option];
+      if (Array.isArray(selectedValues)) {
+        if (findById(selectedValues, option?.value)) {
+          newSelectedValues = selectedValues?.filter(
+            (v) => v?.value !== option?.value
+          );
+        } else {
+          newSelectedValues = [...selectedValues, option];
+        }
       }
     } else {
-      newSelectedValues = [option];
+      newSelectedValues = option;
     }
     setSelectedValues(newSelectedValues);
     onChange(newSelectedValues);
@@ -74,21 +76,39 @@ const TreeSelect: React.FC<TreeSelectProps> = ({
     setShowOptions(false);
   });
 
+  const handleSelectedItems = (par: IOption | IOption[]) => {
+    if (Array.isArray(par)) {
+      par?.map((item: IOption) => (
+        <span key={item?.value} className="tree-select__selected-item">
+          {item?.label}
+          <button
+            className="tree-select__remove-button"
+            onClick={() => handleOptionClick(item)}
+          >
+            &#x2715;
+          </button>
+        </span>
+      ));
+    } else {
+      return (
+        <span className="tree-select__selected-item">
+          {par?.label}
+          <button
+            className="tree-select__remove-button"
+            onClick={() => handleOptionClick(par)}
+          >
+            &#x2715;
+          </button>
+        </span>
+      );
+    }
+  };
+
   return (
     <div ref={treeRef} className="tree-select">
       <div className="tree-select__input">
         <div className="tree-select__selected-items">
-          {selectedValues.map((item) => (
-            <span key={item?.value} className="tree-select__selected-item">
-              {item?.label}
-              <button
-                className="tree-select__remove-button"
-                onClick={() => handleOptionClick(item)}
-              >
-                &#x2715;
-              </button>
-            </span>
-          ))}
+          {handleSelectedItems(selectedValues)}
         </div>
         <input
           type="text"
