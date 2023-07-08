@@ -1,21 +1,33 @@
 import { IOption } from "./types";
 
-function findById(arr: IOption | IOption[], value: string): IOption | null {
-  if (Array.isArray(arr)) {
-    for (const element of arr) {
+function findById(
+  givenData: IOption | IOption[],
+  value: string,
+  returnBool: boolean
+): IOption | boolean {
+  if (Array.isArray(givenData)) {
+    for (const element of givenData) {
       if (element?.value === value) {
-        return element;
+        return returnBool ? true : element;
       }
     }
   } else {
-    if (arr?.value === value) {
-      return arr;
+    if (givenData?.value === value) {
+      return returnBool ? true : givenData;
     } else {
       return null;
     }
   }
-
   return null;
 }
 
-export { findById };
+function flatten(array: IOption[]) {
+  return array.reduce((result, item) => {
+    result.push(item);
+    if (item.children) {
+      result.push(...flatten(item.children));
+    }
+    return result;
+  }, []);
+}
+export { findById, flatten };
